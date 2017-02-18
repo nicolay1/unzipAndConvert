@@ -5,17 +5,36 @@ echo "Please add the name of the archive you want to extract."
 else
 echo "###############"
 echo "Unzip program, need packages : 'unzip', 'sed' and 'ivconv'."
-echo "Will extract THE ONLY file of the archive and will convert it to UTF-8."
+echo "Will extract all files at the ROOT of the archive and will convert them to UTF-8."
 echo "Password may contain non alphanumeric caracters as @:; but NOT accents."
-echo "Please first enter the password attached to the archive passed in parameter."
 echo "###############"
-file=$(unzip -Z1 $1);
-unzip $1;
-typeset -u a=$(echo $(file -bi "$file") | sed -n 's/^[^=]*//p' | sed -n 's/=//p');
-iconv -f "$a" -t UTF-8 "$file" -o "$file.tmp";
-rm "$file";
-mv "$file.tmp" "$file";
+filename=$1
+dir=`echo $1 | sed 's/\.[^.]*$//'`
+echo $dir;
+if [[ -e $dir ]]; then
+    echo "The directory or file '$dir' exist, extraction aborted. Please delete it.";exit;
+fi
+mkdir $dir;
+mv $filename $dir/$filename;
+cd $dir;
+filelines=`unzip -Z1 $filename`
+echo "Please enter the password attached to the archive passed in parameter."
+unzip -o $1;
+echo Start
+for file in $filelines ; do
+    if [ -d "$file" ]; then
+	echo "Please do NOT use directory! Every files should be at the root of the archive.";
+    else
+        echo "extracting and converting : $file";
+        typeset -u a=$(echo $(file -bi "$file") | sed -n 's/^[^=]*//p' | sed -n 's/=//p');
+        iconv -f "$a" -t UTF-8 "$file" -o "$file.tmp";
+        rm "$file";
+        mv "$file.tmp" "$file";
+    fi
+done
 echo ""
 echo "###############"
 echo "Secured extraction done."
 fi
+rm $filename;
+cd ../
