@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "###############"
 echo "Unzip program, need packages : 'unzip', 'sed' and 'ivconv'."
-echo "Will extract all files of the archive into a directory of the same name than the archive. Will also encode all the files with an UTF-8 charset."
+echo "Will extract all archive's files into a directory named as the archive. Will also encode all the files with an UTF-8 charset."
 echo "Password may contain non alphanumeric caracters as @:; but NOT accents."
 echo "Please do not use any space into filenames."
 echo "###############"
