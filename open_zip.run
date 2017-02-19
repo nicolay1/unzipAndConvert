@@ -1,7 +1,7 @@
 #!/bin/bash
 echo "###############"
 echo "Unzip program, need packages : 'unzip', 'sed' and 'ivconv'."
-echo "Will extract all files at the ROOT of the archive into a directory of the same name than the archive. This program will encode all the files with an UTF-8 charset."
+echo "Will extract all files of the archive into a directory of the same name than the archive. Will also encode all the files with an UTF-8 charset."
 echo "Password may contain non alphanumeric caracters as @:; but NOT accents."
 echo "Please do not use any space into filenames."
 echo "###############"
@@ -21,13 +21,13 @@ mkdir $dir;
 echo "Files will be extracted into the directory named '$dir'."
 mv $filename $dir/$filename;#move archive into dir
 cd $dir;#move into dir
-filelines=`unzip -Z1 $filename`# get list of files into the archive
+filelines=`unzip -Z1 $filename`; # get list of files into the archive
 echo "Please enter the password attached to the archive passed in parameter."
 unzip -o $1;# unzip archive
 echo Start
 for file in $filelines ; do # file contain now the current file processed for the conversion
     if [ -d "$file" ]; then
-	echo "Please do NOT use directory! Every files should be at the root of the archive.";
+	echo "$file is a directory. Passed.";
     else
         echo "extracting and converting : $file";
         typeset -u a=$(echo $(file -bi "$file") | sed -n 's/^[^=]*//p' | sed -n 's/=//p');# get uppercased charset of file
