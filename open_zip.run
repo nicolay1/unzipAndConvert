@@ -1,40 +1,44 @@
 #!/bin/bash
-if [ -z "$1" ]
-then
-echo "Please add the name of the archive you want to extract."
-else
 echo "###############"
 echo "Unzip program, need packages : 'unzip', 'sed' and 'ivconv'."
-echo "Will extract all files at the ROOT of the archive and will convert them to UTF-8."
+echo "Will extract all files at the ROOT of the archive into a directory of the same name than the archive. This program will encode all the files with an UTF-8 charset."
 echo "Password may contain non alphanumeric caracters as @:; but NOT accents."
+echo "Please do not use any space into filenames."
 echo "###############"
-filename=$1
-dir=`echo $1 | sed 's/\.[^.]*$//'`
-echo $dir;
+if [ -z "$1" ] #test if an argument is given
+then
+echo "ERROR : Please add the name of the archive you want to extract.";exit;
+else
+if ! [[ -e "$1" ]]; then
+echo "ERROR : Unable to find the file named '$1'.";exit;
+fi
+filename=$1 #filename is now the name of the archive we want to extract
+dir=`echo $1 | sed 's/\.[^.]*$//'` #get the dirname for the extraction
 if [[ -e $dir ]]; then
-    echo "The directory or file '$dir' exist, extraction aborted. Please delete it.";exit;
+    echo "ERROR : The directory or file '$dir' exist, extraction aborted. Please delete it.";exit;
 fi
 mkdir $dir;
-mv $filename $dir/$filename;
-cd $dir;
-filelines=`unzip -Z1 $filename`
+echo "Files will be extracted into the directory named '$dir'."
+mv $filename $dir/$filename;#move archive into dir
+cd $dir;#move into dir
+filelines=`unzip -Z1 $filename`# get list of files into the archive
 echo "Please enter the password attached to the archive passed in parameter."
-unzip -o $1;
+unzip -o $1;# unzip archive
 echo Start
-for file in $filelines ; do
+for file in $filelines ; do # file contain now the current file processed for the conversion
     if [ -d "$file" ]; then
 	echo "Please do NOT use directory! Every files should be at the root of the archive.";
     else
         echo "extracting and converting : $file";
-        typeset -u a=$(echo $(file -bi "$file") | sed -n 's/^[^=]*//p' | sed -n 's/=//p');
-        iconv -f "$a" -t UTF-8 "$file" -o "$file.tmp";
+        typeset -u a=$(echo $(file -bi "$file") | sed -n 's/^[^=]*//p' | sed -n 's/=//p');# get uppercased charset of file
+        iconv -f "$a" -t UTF-8 "$file" -o "$file.tmp"; # convert the file to UTF-8
         rm "$file";
         mv "$file.tmp" "$file";
     fi
 done
 echo ""
 echo "###############"
-echo "Secured extraction done."
+echo "Secure extraction done. Everything worked fine."
 fi
 rm $filename;
 cd ../
